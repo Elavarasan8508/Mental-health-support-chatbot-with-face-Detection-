@@ -1,4 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mental Health Support Chatbot with Face Detection
+
+This project combines facial emotion detection with an AI-powered chatbot to provide mental health support.
+
+## Features
+
+- Real-time facial emotion detection
+- AI-powered mental health support chatbot using Google's Gemini AI
+- Beautiful and responsive UI
+- Dark mode support
+- Mental health tracking capabilities
+
+## Deployment
+
+The application is deployed on GitHub Pages and can be accessed at:
+[https://elavarasan8508.github.io/Mental-health-support-chatbot-with-face-Detection-/](https://elavarasan8508.github.io/Mental-health-support-chatbot-with-face-Detection-/)
 
 ## Getting Started
 
@@ -20,6 +35,27 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment Variables
+
+The following environment variables are required:
+
+```bash
+GOOGLE_API_KEY=your_google_api_key
+DATABASE_URL=your_database_url
+```
+
+Make sure to add these to your `.env` file locally and to GitHub Secrets for deployment.
+
+## Technologies Used
+
+- Next.js 14
+- TypeScript
+- Tailwind CSS
+- Google Gemini AI
+- Face-api.js
+- Prisma
+- SQLite
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
@@ -28,6 +64,10 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Deploy on Vercel
 
