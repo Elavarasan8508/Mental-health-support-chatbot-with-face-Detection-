@@ -3,26 +3,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-import { 
-  Brain, Send,
-  User2Icon
-} from 'lucide-react';
-
+import { Send } from 'lucide-react';
 import { MessageContent } from './MessageContent';
 import { generateGeminiResponse } from '@/actions/gemini';
-import EmotionDetector from './EmotionDetector';
-import MentalHealthTable from './MentalHealthTable';
-import { getMentalDatas, getTodayCompleted, insertMentalHealth, processData } from '@/lib/serveracs';
-import AttendanceTracker from './AttendanceTracker';
-import MarkLeave from './mini/MarkLeave';
-import Profile from './mini/Profile';
 
+interface Message {
+  text: string;
+  isBot: boolean;
+  options?: string[];
+  isMarkdown?: boolean;
+}
 
-const MentalHealthChatbot = ({user, data}:any) => {
-  const [messages, setMessages] = useState([
+interface MentalHealthChatbotProps {
+  user?: unknown;
+  data?: unknown;
+}
+
+const MentalHealthChatbot: React.FC<MentalHealthChatbotProps> = () => {
+  const [messages, setMessages] = useState<Message[]>([
     { 
       text: "Hi! I'm your mental health companion. You can ask Anything",
       isBot: true,
@@ -30,54 +29,16 @@ const MentalHealthChatbot = ({user, data}:any) => {
     }
   ]);
 
-  const [emo, setEmo] = useState("Not Detected");
-
-
-  
-  const [formData, setFormData] = useState({
-    sadness: false,
-    euphoric: false,
-    exhausted: false,
-    sleep_disorder: false,
-    mood_swing: false,
-    suicidal_thoughts: false,
-    anorexia: false,
-    authority_respect: false,
-    try_explanation: false,
-    aggressive_response: false,
-    ignore_and_move_on: false,
-    nervous_breakdown: false,
-    admit_mistakes: false,
-    overthinking: false,
-    concentration: 5,
-    optimism: 5
-  });
-
-  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [emo] = useState("Not Detected");
   const [isThinking, setIsThinking] = useState(false);
   const [userInput, setUserInput] = useState('');
-  const messagesEndRef = useRef(null);
-  const scrollAreaRef = useRef(null);
-
-
-  const [datas, setDatas] = useState<any[]>([]);
-  const [todayCompleted, setTadayCompleted] = useState<boolean>(false);
-
-  const [pred, setPred] = useState({type:"Predicting"});
-
-
-  useEffect(() => {
-
-
-
-  }, []);
-
-
-
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [pred] = useState({ type: "Predicting" });
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement;
       if (scrollContainer) {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
@@ -88,7 +49,7 @@ const MentalHealthChatbot = ({user, data}:any) => {
     scrollToBottom();
   }, [messages, isThinking]);
 
-  const addMessage = (message, delay = 1000) => {
+  const addMessage = (message: Message, delay = 1000) => {
     setIsThinking(true);
     setTimeout(() => {
       setMessages(prev => [...prev, message]);
@@ -98,54 +59,51 @@ const MentalHealthChatbot = ({user, data}:any) => {
 
   const handleSendMessage = async () => {
     if (userInput.trim()) {
-      setMessages(prev => [...prev, { text: userInput, isBot: false }]);
+      setMessages(prev => [...prev, { text: userInput, isBot: false, options: [] }]);
       const currentInput = userInput;
       setUserInput('');
       await askAi(currentInput);
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const askAi = async (prompt) => {
+  const askAi = async (prompt: string) => {
     setIsThinking(true);
 
     try {
-      const res = await generateGeminiResponse(prompt,messages,emo,pred);
-      setMessages(prev => [...prev, { text: res, isBot: true, isMarkdown: true }]);
+      const res = await generateGeminiResponse(prompt, messages, emo, pred);
+      setMessages(prev => [...prev, { text: res, isBot: true, isMarkdown: true, options: [] }]);
     } catch (error) {
       console.error('Error calling AI:', error);
       setMessages(prev => [...prev, { 
         text: "Sorry, I'm having trouble connecting right now. Please try again later.", 
-        isBot: true 
+        isBot: true,
+        options: []
       }]);
     } finally {
       setIsThinking(false);
     }
   };
 
-  const handleOptionClick = (option) => {
-    setMessages(prev => [...prev, { text: option, isBot: false }]);
+  const handleOptionClick = (option: string) => {
+    setMessages(prev => [...prev, { text: option, isBot: false, options: [] }]);
     
     if (option === "Yes, let's begin") {
       setTimeout(() => {
         addMessage({
           text: "I'll ask you a series of questions to better understand how you're feeling. Please answer honestly - this is a safe space.",
-          isBot: true
+          isBot: true,
+          options: []
         });
-        setCurrentQuestion(0);
       }, 500);
     }
   };
-
-
-
-
 
   return (
     <div className="max-h-screen g-gradient-to-br from-blue-50 to-blue-50 p-4 relative">
@@ -153,7 +111,6 @@ const MentalHealthChatbot = ({user, data}:any) => {
         <CardHeader className="border-b bg-gradient-to-r from-blue-100 to-blue-100">
           <CardTitle className="flex items-center justify-between space-x-2 text-gradient bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-600">
            Chatbot
-
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -167,52 +124,17 @@ const MentalHealthChatbot = ({user, data}:any) => {
                       : 'bg-gradient-to-r from-blue-500 to-blue-500 text-white'
                   }`}>
                     <MessageContent message={msg} />
-                    {msg.options && (
+                    {msg.options && msg.options.length > 0 && (
                       <div className="mt-4 space-y-2">
-                        {msg.options.map((option) => (
+                        {msg.options.map((option, optIdx) => (
                           <Button
-                            key={option}
+                            key={optIdx}
                             onClick={() => handleOptionClick(option)}
                             className="w-full bg-white text-blue-600 hover:bg-blue-50"
                           >
                             {option}
                           </Button>
                         ))}
-                      </div>
-                    )}
-                    {msg.question && (
-                      <div className="mt-4 space-y-4">
-                        {msg.question.type === 'boolean' ? (
-                          <div className="flex justify-center space-x-4">
-                            <Button
-                              onClick={() => handleResponse(true)}
-                              className="bg-blue-500 hover:bg-blue-600 text-white"
-                            >
-                              Yes
-                            </Button>
-                            <Button
-                              onClick={() => handleResponse(false)}
-                              className="bg-red-500 hover:bg-red-600 text-white"
-                            >
-                              No
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <Slider
-                              defaultValue={[5]}
-                              max={10}
-                              min={1}
-                              step={1}
-                              className="w-full"
-                              onValueCommit={([value]) => handleResponse(value)}
-                            />
-                            <div className="flex justify-between text-sm">
-                              <span>1</span>
-                              <span>10</span>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -222,9 +144,9 @@ const MentalHealthChatbot = ({user, data}:any) => {
                 <div className="flex justify-start">
                   <div className="bg-gradient-to-r from-blue-100 to-blue-100 rounded-2xl p-4">
                     <div className="flex space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce animation-delay-0" />
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce animation-delay-150" />
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce animation-delay-300" />
                     </div>
                   </div>
                 </div>
@@ -253,8 +175,6 @@ const MentalHealthChatbot = ({user, data}:any) => {
           </div>
         </CardContent>
       </Card>
-
-
     </div>
   );
 };
