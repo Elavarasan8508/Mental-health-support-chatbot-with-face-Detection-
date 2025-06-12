@@ -5,6 +5,10 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+env:
+  GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+  DATABASE_URL: "file:./prisma/dev.db"
+
 permissions:
   contents: read
   pages: write
@@ -29,14 +33,16 @@ jobs:
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        
-      - name: Install dependencies
-        run: npm ci
+          - name: Install dependencies
+        run: |
+          npm install
+          npx prisma generate
       
       - name: Build with Next.js
         run: npm run build
         env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          NEXT_PUBLIC_GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          NODE_ENV: production
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

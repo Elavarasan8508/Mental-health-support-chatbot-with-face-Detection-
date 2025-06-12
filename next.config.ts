@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/Mental-health-support-chatbot-with-face-Detection-' : '',
+  basePath: '/Mental-health-support-chatbot-with-face-Detection-',
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },
